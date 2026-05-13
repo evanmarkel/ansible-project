@@ -1,0 +1,11 @@
+- name: Configure monitored hosts with Alloy
+  hosts: monitored
+  become: true
+  roles:
+    - alloy
+
+- name: Configure Grafana
+  hosts: grafana
+  become: true
+  roles:
+    - grafana

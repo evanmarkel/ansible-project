@@ -1,0 +1,38 @@
+- name: Install dependencies
+  apt:
+    name:
+      - curl
+    state: present
+    update_cache: yes
+
+- name: Download Alloy binary
+  get_url:
+    url: "https://github.com/grafana/alloy/releases/download/{{ alloy_version }}/alloy-linux-amd64"
+    dest: /usr/local/bin/alloy
+    mode: "0755"
+
+- name: Create config directory
+  file:
+    path: "{{ alloy_config_path | dirname }}"
+    state: directory
+    mode: "0755"
+
+- name: Deploy Alloy config
+  template:
+    src: alloy-config.yaml.j2
+    dest: "{{ alloy_config_path }}"
+    mode: "0644"
+  notify: restart alloy
+
+- name: Install systemd service
+  template:
+    src: systemd-alloy.service.j2
+    dest: /etc/systemd/system/{{ alloy_service_name }}.service
+    mode: "0644"
+  notify: restart alloy
+
+- name: Ensure Alloy is running
+  systemd:
+    name: "{{ alloy_service_name }}"
+    enabled: true
+    state: started
