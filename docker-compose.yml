@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  host-a:
+    image: ghcr.io/ubuntu/systemd:20.04
+    container_name: host-a
+    privileged: true
+    command: ["/sbin/init"]
+    networks:
+      - observability
+    ports:
+      - "2222:22"
+    environment:
+      - container=docker
+    volumes:
+      - host-a-data:/var/lib
+
+  host-b:
+    image: ghcr.io/ubuntu/systemd:20.04
+    container_name: host-b
+    privileged: true
+    command: ["/sbin/init"]
+    networks:
+      - observability
+    ports:
+      - "2223:22"
+    environment:
+      - container=docker
+    volumes:
+      - host-b-data:/var/lib
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    networks:
+      - observability
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./ansible/roles/grafana/files/provisioning:/etc/grafana/provisioning
+
+networks:
+  observability:
+
+volumes:
+  host-a-data:
+  host-b-data:
+  grafana-data:
