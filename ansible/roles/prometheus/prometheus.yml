@@ -1,0 +1,9 @@
+global:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+  
+  # In federation mode, Prometheus does NOT scrape anything.
+  # Alloy scrapes locally and remote_writes here.
+  scrape_configs: []
+  
+  # Remote write ingestion is enabled by default in Prometheus no additional config
