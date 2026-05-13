@@ -1,15 +1,43 @@
-- name: Ensure provisioning directory exists (if needed)
+---
+# Ensure provisioning directories exist
+- name: Ensure Grafana provisioning directories exist
   file:
-    path: "{{ grafana_provisioning_path }}"
+    path: "/etc/grafana/provisioning/{{ item }}"
     state: directory
+    owner: root
+    group: root
     mode: "0755"
+  loop:
+    - datasources
+    - dashboards
+    - alerting
+    notify: restart grafana
 
-# If you need to tweak grafana.ini via template, do it here and notify restart
-
-- name: Copy provisioning files
+# Copy datasource provisioning
+- name: Copy Grafana datasource provisioning
   copy:
-    src: provisioning/
-    dest: "{{ grafana_provisioning_path }}/"
+    src: provisioning/datasources/
+    dest: /etc/grafana/provisioning/datasources/
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart grafana
+
+# Copy dashboard provider + dashboards
+- name: Copy Grafana dashboard provisioning
+  copy:
+    src: provisioning/dashboards/
+    dest: /etc/grafana/provisioning/dashboards/
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart grafana
+
+# Copy alert rules
+- name: Copy Grafana alert rule provisioning
+  copy:
+    src: provisioning/alerting/
+    dest: /etc/grafana/provisioning/alerting/
     owner: root
     group: root
     mode: "0644"

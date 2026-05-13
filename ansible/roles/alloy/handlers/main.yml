@@ -1,0 +1,7 @@
+---
+- name: restart alloy
+  systemd:
+    name: "{{ alloy_service_name }}"
+    state: restarted
+    daemon_reload: yes
+    

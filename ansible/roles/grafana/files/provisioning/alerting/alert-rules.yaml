@@ -4,9 +4,7 @@ groups:
     interval: 1m
     rules:
 
-      # -----------------------------
       # High CPU Usage (5m sustained)
-      # -----------------------------
       - uid: high_cpu_usage
         title: "High CPU Usage"
         condition: C
@@ -53,9 +51,7 @@ groups:
           summary: "High CPU usage detected"
           description: "CPU usage has exceeded 80% for more than 5 minutes."
 
-      # -----------------------------
       # Low Memory Alert
-      # -----------------------------
       - uid: low_memory
         title: "Low Available Memory"
         condition: C
