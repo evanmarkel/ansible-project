@@ -39,7 +39,7 @@
     dest: /usr/local/bin/run-alloy.sh
     mode: '0755'
     content: |
-        #!/bin/bash
-        exec /usr/local/bin/alloy \
+      #!/bin/bash
+      exec /usr/bin/alloy run \
         --config.file=/etc/alloy/config.alloy \
         --storage.path=/var/lib/alloy
