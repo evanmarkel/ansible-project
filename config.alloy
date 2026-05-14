@@ -1,0 +1,18 @@
+logging {
+  level = "info"
+}
+
+prometheus.scrape "local" {
+  targets = [
+    {
+      __address__ = "localhost:12345"
+    },
+  ]
+}
+
+prometheus.remote_write "to_prometheus" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+}
+

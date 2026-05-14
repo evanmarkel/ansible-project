@@ -1,5 +1,4 @@
 - name: Configure monitored hosts with Alloy
   hosts: monitored
-  become: true
   roles:
     - alloy

@@ -1,41 +1,32 @@
 services:
   host-a:
-    image: gotechnies/alpine-ssh
+    build: ./ansible/docker/sshd-host
     container_name: host-a
+    privileged: true
+    networks:
+      - observability
     ports:
       - "2222:22"
-    networks:
-      - observability
     volumes:
-      - ./ansible/ssh/host-a_authorized_keys:/root/.ssh/authorized_keys
-    command: >
-      sh -c "apk add --no-cache python3 &&
-             mkdir -p /root/.ssh &&
-             chmod 700 /root/.ssh &&
-             chmod 600 /root/.ssh/authorized_keys &&
-             /usr/sbin/sshd -D"
+      - ./ssh/authorized_keys:/root/.ssh/authorized_keys:ro
   
   host-b:
-    image: gotechnies/alpine-ssh
+    build: ./ansible/docker/sshd-host
     container_name: host-b
-    ports:
-      - "2223:22"
+    privileged: true
     networks:
       - observability
+    ports:
+      - "2223:22"
     volumes:
-      - ./ansible/ssh/host-b_authorized_keys:/root/.ssh/authorized_keys
-    command: >
-      sh -c "apk add --no-cache python3 &&
-             mkdir -p /root/.ssh &&
-             chmod 700 /root/.ssh &&
-             chmod 600 /root/.ssh/authorized_keys &&
-             /usr/sbin/sshd -D"
-
+      - ./ssh/authorized_keys:/root/.ssh/authorized_keys:ro  
+  
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
     ports:
       - "9090:9090"
     networks:
@@ -44,11 +35,16 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
     ports:
       - "3000:3000"
     networks:
-      - observability
-    
+      - observability      
+
 networks:
   observability:
     name: observability

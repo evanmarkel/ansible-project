@@ -1,30 +1,26 @@
 #!/usr/bin/env bash
 set -e
 
-echo "🚀 Starting SSHD-mode containers..."
+echo "🚀 Starting Docker hosts..."
 docker compose up -d host-a host-b
 
-echo "⏳ Waiting for SSHD to become ready..."
-sleep 3
+echo "⏳ Waiting for SSH ports to open..."
+for port in 2222 2223; do
+  until nc -z localhost "$port"; do
+    sleep 1
+  done
+done
 
-echo "🔧 Running Ansible provisioning..."
-ansible-playbook -i ./ansible/inventory/hosts.yml ./ansible/site.yml
+echo "🔍 Running SSH validator..."
+./validate-ssh.sh
 
-echo "📦 Building Alloy images from clean Dockerfiles..."
-docker build -t host-a-alloy -f docker/alloy/Dockerfile /tmp/host-a
-docker build -t host-b-alloy -f docker/alloy/Dockerfile /tmp/host-b
+echo "🔐 SSH validated. Running Ansible provisioning..."
+ansible-playbook -i ansible/inventory ansible/tasks/alloy.yml
 
-echo "🧹 Removing SSHD-mode containers..."
-docker rm -f host-a host-b 2>/dev/null || true
-
-echo "🔄 Starting Alloy-mode containers..."
-docker run -d --name host-a --network observability host-a-alloy
-docker run -d --name host-b --network observability host-b-alloy
-
-echo "🚀 Starting Prometheus and Grafana..."
+echo "📊 Starting Prometheus and Grafana..."
 docker compose up -d prometheus grafana
 
-echo "✅ All Services are up!"
-echo "📊 Prometheus: http://localhost:9090"
-echo "📈 Grafana:    http://localhost:3000"
-
+echo ""
+echo "🎉 Environment is ready!"
+echo "Prometheus: http://localhost:9090"
+echo "Grafana:    http://localhost:3000"

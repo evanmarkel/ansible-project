@@ -2,8 +2,12 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
-# In federation mode, Prometheus does NOT scrape anything.
-# Alloy scrapes locally and remote_writes here.
-scrape_configs: []
+# federated alloy - each writes metrics to volume
+remote_write:
+  - url: "http://prometheus:9090/api/v1/write"
 
-# Remote write ingestion is enabled by default in Prometheus no additional config
+# Prometheus scrapes its own metrics
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
