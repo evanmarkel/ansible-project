@@ -1,8 +1,5 @@
-server {
-  http {
-    listen_address = "0.0.0.0"
-    listen_port    = 12345
-  }
+logging {
+  level = "info"
 }
 
 prometheus.scrape "self" {

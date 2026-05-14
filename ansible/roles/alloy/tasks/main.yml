@@ -40,6 +40,7 @@
     mode: '0755'
     content: |
       #!/bin/bash
-      exec /usr/bin/alloy run \
-        --config.file=/etc/alloy/config.alloy \
+      exec /usr/bin/alloy run /etc/alloy/config.alloy \
         --storage.path=/var/lib/alloy
+        --listen-address=0.0.0.0 \
+        --listen-port=12345
