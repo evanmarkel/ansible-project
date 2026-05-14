@@ -9,3 +9,6 @@ ansible.pub
 # SSH artifacts
 .ssh/
 known_hosts
+
+host-a_authorized_keys
+host-b_authorized_keys

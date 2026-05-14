@@ -1,6 +1,7 @@
 apiVersion: 1
 groups:
   - name: host-alerts
+    folder: "Host Alerts"
     interval: 1m
     rules:
 

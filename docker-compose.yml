@@ -1,61 +1,50 @@
 services:
   host-a:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
+    image: panubo/sshd:1.4.0
+    container_name: host-a
+    environment:
+      - SSH_ENABLE_ROOT=true
+    volumes:
+      - ./ansible/ssh/host-a_authorized_keys:/root/.ssh/authorized_keys:ro
     ports:
       - "2222:22"
-    container_name: host-a
     networks:
       - observability
-    volumes:
-      - host-a-data:/var/lib
 
   host-b:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
+    image: panubo/sshd:1.4.0
+    container_name: host-b
+    environment:
+      - SSH_ENABLE_ROOT=true
+    volumes:
+      - ./ansible/ssh/host-b_authorized_keys:/root/.ssh/authorized_keys:ro
     ports:
       - "2223:22"
-    container_name: host-b
     networks:
       - observability
-    volumes:
-      - host-b-data:/var/lib
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    networks:
-      - observability
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
+    networks:
+      - observability
 
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    networks:
-      - observability
     ports:
       - "3000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./ansible/roles/grafana/files/provisioning:/etc/grafana/provisioning
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
+    networks:
+      - observability
     
 networks:
   observability:
     name: observability
 
 volumes:
-  host-a-data:
-  host-b-data:
   prometheus-data:
   grafana-data:

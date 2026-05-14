@@ -1,54 +1,55 @@
 ---
-# Install dependencies
-- name: Ensure required packages are installed
-  apt:
-    name:
-      - curl
-      - ca-certificates
-      - unzip
-    state: present
-    update_cache: yes
-
-# Get Alloy zip
-- name: Download Alloy zip
-  get_url:
-    url: "{{ alloy_binary_url }}"
-    dest: /tmp/alloy.zip
-    mode: "0644"
-
-# Extract zip
-- name: Extract Alloy zip
-  unarchive:
-    src: /tmp/alloy.zip
-    dest: /usr/local/bin
-    remote_src: yes
-
-# Rename (clean up later)
-- name: Rename Alloy binary
-  command: mv /usr/local/bin/alloy-linux-amd64 /usr/local/bin/alloy
-  args:
-    removes: /usr/local/bin/alloy-linux-amd64
-
-# Make sure it works
-- name: Ensure Alloy binary is executable
+# 1. Download Alloy ZIP
+- name: Ensure download directory exists on control machine
+  delegate_to: localhost
   file:
-    path: /usr/local/bin/alloy
-    mode: "0755"  
-
-# Create config directory
-- name: Ensure Alloy config directory exists
-  file:
-    path: "{{ alloy_config_path | dirname }}"
+    path: "/tmp/alloy-download"
     state: directory
-    owner: root
-    group: root
-    mode: "0755"
+    mode: '0755'
 
-# Deploy Alloy config
-- name: Deploy Alloy configuration
+- name: Download Alloy ZIP on control machine
+  delegate_to: localhost
+  get_url:
+    url: "https://github.com/grafana/alloy/releases/download/v1.7.0/alloy-linux-amd64.zip"
+    dest: "/tmp/alloy-download/alloy.zip"
+    mode: '0644'
+
+- name: Extract Alloy ZIP on control machine
+  delegate_to: localhost
+  unarchive:
+    src: "/tmp/alloy-download/alloy.zip"
+    dest: "/tmp/alloy-download"
+    remote_src: no
+
+# 2. Install Alloy inside SSHD-mode container
+- name: Install Alloy binary on remote host
+  copy:
+    src: "/tmp/alloy-download/alloy"
+    dest: "/usr/local/bin/alloy"
+    mode: '0755'
+
+- name: Render Alloy config on remote host
   template:
-    src: alloy-config.yaml.j2
-    dest: "{{ alloy_config_path }}"
-    owner: root
-    group: root
-    mode: "0644"
+    src: "config.yaml.j2"
+    dest: "/etc/alloy/config.yaml"
+    mode: '0644'
+
+# 3. Prepare build context for Dockerfile
+- name: Ensure staging directory exists on control machine
+  delegate_to: localhost
+  file:
+    path: "/tmp/{{ inventory_hostname }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy Alloy binary back to control machine
+  fetch:
+    src: "/usr/local/bin/alloy"
+    dest: "/tmp/{{ inventory_hostname }}/alloy"
+    flat: yes
+
+- name: Copy Alloy config back to control machine
+  fetch:
+    src: "/etc/alloy/config.yaml"
+    dest: "/tmp/{{ inventory_hostname }}/config.yaml"
+    flat: yes

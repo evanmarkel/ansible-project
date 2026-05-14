@@ -1,42 +1,11 @@
-# Alloy configuration for monitored hosts
-# Federation mode: Alloy scrapes local exporters and remote_writes to Prometheus.
+metrics:
+  wal_directory: /var/lib/alloy/wal
 
-logging {
-  level = "info"
-}
+prometheus:
+  global:
+    scrape_interval: 5s
 
-# -----------------------------
-# Exporters
-# -----------------------------
-
-prometheus.exporter.unix "unix" {
-  filesystem {
-    mount_points = ["/"]
-  }
-}
-
-prometheus.exporter.process "processes" {
-  match = ".*"
-}
-
-# -----------------------------
-# Local scrape job
-# -----------------------------
-# Alloy scrapes its own exporters locally. The exporters bind to the same
-# port Alloy exposes internally ({{ alloy_exporter_port }}).
-
-prometheus.scrape "local" {
-  targets = ["localhost:{{ alloy_exporter_port }}"]
-}
-
-# -----------------------------
-# Remote Write → Prometheus
-# -----------------------------
-# Alloy pushes all scraped metrics to the Prometheus instance running in
-# docker-compose. This is the core of the federation model.
-
-prometheus.remote_write "to_prometheus" {
-  endpoint {
-    url = "http://{{ prometheus_host }}:{{ prometheus_remote_write_port }}/api/v1/write"
-  }
-}
+  scrape_configs:
+    - job_name: "{{ inventory_hostname }}"
+      static_configs:
+        - targets: ["localhost:12345"]
