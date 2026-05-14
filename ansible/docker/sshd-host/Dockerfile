@@ -13,4 +13,5 @@ RUN apt-get update && \
     echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
     echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
 
-CMD ["/usr/sbin/sshd", "-D"]
+COPY start.sh /start.sh
+CMD ["/start.sh"]

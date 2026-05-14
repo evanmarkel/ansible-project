@@ -15,7 +15,7 @@ echo "🔍 Running SSH validator..."
 ./validate-ssh.sh
 
 echo "🔐 SSH validated. Running Ansible provisioning..."
-ansible-playbook -i ansible/inventory ansible/tasks/alloy.yml
+ansible-playbook -i ansible/inventory ansible/site.yml
 
 echo "📊 Starting Prometheus and Grafana..."
 docker compose up -d prometheus grafana

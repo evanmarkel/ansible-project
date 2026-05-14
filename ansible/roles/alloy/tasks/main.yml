@@ -1,0 +1,45 @@
+---
+- name: Create alloy user
+  user:
+    name: alloy
+    system: yes
+    shell: /usr/sbin/nologin
+
+- name: Create alloy directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: alloy
+    group: alloy
+    mode: '0755'
+  loop:
+    - /etc/alloy
+    - /var/lib/alloy
+
+- name: Download Alloy .deb package
+  get_url:
+    url: "https://github.com/grafana/alloy/releases/download/v1.16.1/alloy-1.16.1-1.amd64.deb"
+    dest: /tmp/alloy.deb
+    mode: '0644'
+  
+- name: Install Alloy package
+  apt:
+    deb: /tmp/alloy.deb
+
+- name: Deploy Alloy config
+  copy:
+    src: config.alloy
+    dest: /etc/alloy/config.alloy
+    owner: alloy
+    group: alloy
+    mode: '0644'
+
+- name: Install run script
+  copy:
+    dest: /usr/local/bin/run-alloy.sh
+    mode: '0755'
+    content: |
+        #!/bin/bash
+        exec /usr/local/bin/alloy \
+        --config.file=/etc/alloy/config.alloy \
+        --storage.path=/var/lib/alloy

@@ -1,0 +1,7 @@
+logging {
+  level = "info"
+}
+
+prometheus.scrape "self" {
+  targets = [{ __address__ = "localhost:12345" }]
+}
