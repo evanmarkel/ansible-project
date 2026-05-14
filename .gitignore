@@ -1,3 +1,11 @@
 # Ignore VS Code workspace settings and metadata
 .vscode/
 *.code-workspace
+
+ansible_key
+ansible_key.pub
+ansible.pub
+
+# SSH artifacts
+.ssh/
+known_hosts

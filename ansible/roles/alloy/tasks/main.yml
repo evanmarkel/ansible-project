@@ -5,16 +5,35 @@
     name:
       - curl
       - ca-certificates
+      - unzip
     state: present
     update_cache: yes
 
-# Install Alloy binary
-- name: Download Alloy binary
+# Get Alloy zip
+- name: Download Alloy zip
   get_url:
     url: "{{ alloy_binary_url }}"
-    dest: /usr/local/bin/alloy
-    mode: "0755"
-  notify: restart alloy
+    dest: /tmp/alloy.zip
+    mode: "0644"
+
+# Extract zip
+- name: Extract Alloy zip
+  unarchive:
+    src: /tmp/alloy.zip
+    dest: /usr/local/bin
+    remote_src: yes
+
+# Rename (clean up later)
+- name: Rename Alloy binary
+  command: mv /usr/local/bin/alloy-linux-amd64 /usr/local/bin/alloy
+  args:
+    removes: /usr/local/bin/alloy-linux-amd64
+
+# Make sure it works
+- name: Ensure Alloy binary is executable
+  file:
+    path: /usr/local/bin/alloy
+    mode: "0755"  
 
 # Create config directory
 - name: Ensure Alloy config directory exists
@@ -33,21 +52,3 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart alloy
-
-# Install systemd service
-- name: Install Alloy systemd service
-    template:
-      src: systemd-alloy.service.j2
-      dest: "/etc/systemd/system/{{ alloy_service_name }}.service"
-      owner: root
-      group: root
-      mode: "0644"
-    notify: restart alloy
-
-# Enable + start Alloy
-- name: Ensure Alloy service is enabled and running
-  systemd:
-    name: "{{ alloy_service_name }}"
-    enabled: true
-    state: started

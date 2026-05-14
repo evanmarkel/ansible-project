@@ -3,9 +3,3 @@
   become: true
   roles:
     - alloy
-
-- name: Configure Grafana
-  hosts: grafana
-  become: true
-  roles:
-    - grafana

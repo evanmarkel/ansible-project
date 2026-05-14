@@ -1,6 +1,10 @@
 # Alloy configuration for monitored hosts
 # Federation mode: Alloy scrapes local exporters and remote_writes to Prometheus.
 
+logging {
+  level = "info"
+}
+
 # -----------------------------
 # Exporters
 # -----------------------------
@@ -22,9 +26,7 @@ prometheus.exporter.process "processes" {
 # port Alloy exposes internally ({{ alloy_exporter_port }}).
 
 prometheus.scrape "local" {
-  targets = [
-    "localhost:{{ alloy_exporter_port }}"
-  ]
+  targets = ["localhost:{{ alloy_exporter_port }}"]
 }
 
 # -----------------------------

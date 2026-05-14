@@ -1,44 +1,29 @@
-version: "3.9"
-
 services:
   host-a:
-    image: ghcr.io/ubuntu/systemd:20.04
-    container_name: host-a
-    privileged: true
-    command: ["/sbin/init"]
-    networks:
-      - observability
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
     ports:
       - "2222:22"
-    environment:
-      - container=docker
+    container_name: host-a
+    networks:
+      - observability
     volumes:
       - host-a-data:/var/lib
 
   host-b:
-    image: ghcr.io/ubuntu/systemd:20.04
-    container_name: host-b
-    privileged: true
-    command: ["/sbin/init"]
-    networks:
-      - observability
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
     ports:
       - "2223:22"
-    environment:
-      - container=docker
-    volumes:
-      - host-b-data:/var/lib
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
+    container_name: host-b
     networks:
       - observability
-    ports:
-      - "3000:3000"
     volumes:
-      - grafana-data:/var/lib/grafana
-      - ./ansible/roles/grafana/files/provisioning:/etc/grafana/provisioning
+      - host-b-data:/var/lib
 
   prometheus:
     image: prom/prometheus:latest
@@ -50,10 +35,24 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
-    
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    networks:
+      - observability
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./ansible/roles/grafana/files/provisioning:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    
 networks:
   observability:
+    name: observability
 
 volumes:
   host-a-data:
