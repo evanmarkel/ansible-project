@@ -1,55 +1,41 @@
 ---
-# 1. Download Alloy ZIP
-- name: Ensure download directory exists on control machine
+# 1. Download Alloy on control machine
+- name: Ensure download directory exists
   delegate_to: localhost
   file:
     path: "/tmp/alloy-download"
     state: directory
-    mode: '0755'
 
-- name: Download Alloy ZIP on control machine
+- name: Download Alloy ZIP
   delegate_to: localhost
   get_url:
     url: "https://github.com/grafana/alloy/releases/download/v1.7.0/alloy-linux-amd64.zip"
     dest: "/tmp/alloy-download/alloy.zip"
-    mode: '0644'
 
-- name: Extract Alloy ZIP on control machine
+- name: Extract Alloy ZIP
   delegate_to: localhost
   unarchive:
     src: "/tmp/alloy-download/alloy.zip"
     dest: "/tmp/alloy-download"
     remote_src: no
 
-# 2. Install Alloy inside SSHD-mode container
-- name: Install Alloy binary on remote host
-  copy:
-    src: "/tmp/alloy-download/alloy"
-    dest: "/usr/local/bin/alloy"
-    mode: '0755'
-
-- name: Render Alloy config on remote host
-  template:
-    src: "config.yaml.j2"
-    dest: "/etc/alloy/config.yaml"
-    mode: '0644'
-
-# 3. Prepare build context for Dockerfile
-- name: Ensure staging directory exists on control machine
-  delegate_to: localhost
+# 2. Prepare output directory
+- name: Ensure output directory exists
   file:
-    path: "/tmp/{{ inventory_hostname }}"
+    path: "{{ output_dir }}"
     state: directory
     mode: '0755'
 
-- name: Copy Alloy binary back to control machine
-  fetch:
-    src: "/usr/local/bin/alloy"
-    dest: "/tmp/{{ inventory_hostname }}/alloy"
-    flat: yes
+# 3. Copy Alloy binary
+- name: Copy Alloy binary
+  copy:
+    src: "/tmp/alloy-download/alloy"
+    dest: "{{ output_dir }}/alloy"
+    mode: '0755'
 
-- name: Copy Alloy config back to control machine
-  fetch:
-    src: "/etc/alloy/config.yaml"
-    dest: "/tmp/{{ inventory_hostname }}/config.yaml"
-    flat: yes
+# 4. Render Alloy config
+- name: Render Alloy config
+  template:
+    src: "config.yaml.j2"
+    dest: "{{ output_dir }}/config.yaml"
+    mode: '0644'

@@ -1,27 +1,35 @@
 services:
   host-a:
-    image: panubo/sshd:1.4.0
+    image: gotechnies/alpine-ssh
     container_name: host-a
-    environment:
-      - SSH_ENABLE_ROOT=true
-    volumes:
-      - ./ansible/ssh/host-a_authorized_keys:/root/.ssh/authorized_keys:ro
     ports:
       - "2222:22"
     networks:
       - observability
-
-  host-b:
-    image: panubo/sshd:1.4.0
-    container_name: host-b
-    environment:
-      - SSH_ENABLE_ROOT=true
     volumes:
-      - ./ansible/ssh/host-b_authorized_keys:/root/.ssh/authorized_keys:ro
+      - ./ansible/ssh/host-a_authorized_keys:/root/.ssh/authorized_keys
+    command: >
+      sh -c "apk add --no-cache python3 &&
+             mkdir -p /root/.ssh &&
+             chmod 700 /root/.ssh &&
+             chmod 600 /root/.ssh/authorized_keys &&
+             /usr/sbin/sshd -D"
+  
+  host-b:
+    image: gotechnies/alpine-ssh
+    container_name: host-b
     ports:
       - "2223:22"
     networks:
       - observability
+    volumes:
+      - ./ansible/ssh/host-b_authorized_keys:/root/.ssh/authorized_keys
+    command: >
+      sh -c "apk add --no-cache python3 &&
+             mkdir -p /root/.ssh &&
+             chmod 700 /root/.ssh &&
+             chmod 600 /root/.ssh/authorized_keys &&
+             /usr/sbin/sshd -D"
 
   prometheus:
     image: prom/prometheus:latest
