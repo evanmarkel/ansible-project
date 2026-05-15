@@ -10,6 +10,38 @@
     "templating": {
       "list": [
         {
+          "kind": "QueryVariable",
+          "spec": {
+            "name": "host",
+            "type": "query",
+            "definition": "label_values(up, instance)",
+            "query": {
+              "group": "prometheus",
+              "kind": "DataQuery",
+              "spec": {
+                "qryType": 5,
+                "query": "label_values(up, instance)",
+                "refId": "PrometheusVariableQueryEditor-VariableQuery"
+              },
+              "version": "v0"
+            },
+            "current": {
+              "text": "",
+              "value": ""
+            },
+            "options": [],
+            "includeAll": false,
+            "multi": false,
+            "refresh": "onDashboardLoad",
+            "regex": "",
+            "regexApplyTo": "value",
+            "sort": "alphabeticalAsc",
+            "skipUrlSync": false,
+            "allowCustomValue": true,
+            "hide": "dontHide"
+          }
+        },        
+        {
           "name": "host",
           "type": "query",
           "datasource": "Prometheus",
