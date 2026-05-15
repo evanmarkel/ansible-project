@@ -1,129 +1,228 @@
 {
-    "id": null,
-    "uid": "sre-host-dashboard",
-    "title": "SRE Host Observability",
-    "tags": ["sre", "infra", "prometheus"],
-    "timezone": "browser",
-    "schemaVersion": 36,
-    "version": 1,
-    "refresh": "10s",
-    "templating": {
-      "list": [
-        {
-          "kind": "QueryVariable",
-          "spec": {
-            "name": "host",
-            "type": "query",
-            "definition": "label_values(up, instance)",
-            "query": {
-              "group": "prometheus",
-              "kind": "DataQuery",
-              "spec": {
-                "qryType": 5,
-                "query": "label_values(up, instance)",
-                "refId": "PrometheusVariableQueryEditor-VariableQuery"
-              },
-              "version": "v0"
-            },
-            "current": {
-              "text": "",
-              "value": ""
-            },
-            "options": [],
-            "includeAll": false,
-            "multi": false,
-            "refresh": "onDashboardLoad",
-            "regex": "",
-            "regexApplyTo": "value",
-            "sort": "alphabeticalAsc",
-            "skipUrlSync": false,
-            "allowCustomValue": true,
-            "hide": "dontHide"
-          }
-        },        
-        {
+  "id": null,
+  "uid": "sre-host-dashboard",
+  "title": "SRE Host Observability",
+  "tags": ["sre", "infra", "prometheus"],
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "10s",
+  "noDataState": "hide",
+  "templating": {
+    "list": [
+      {
+        "kind": "QueryVariable",
+        "spec": {
           "name": "host",
           "type": "query",
-          "datasource": "Prometheus",
-          "refresh": 1,
-          "query": "label_values(process_cpu_seconds_total, instance)",
+          "definition": "label_values(up, instance)",
+          "query": {
+            "group": "prometheus",
+            "kind": "DataQuery",
+            "spec": {
+              "qryType": 5,
+              "query": "label_values(up, instance)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "version": "v0"
+          },
+          "current": {
+            "text": "",
+            "value": ""
+          },
+          "options": [],
           "includeAll": false,
           "multi": false,
-          "sort": 1
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "regexApplyTo": "value",
+          "sort": "alphabeticalAsc",
+          "skipUrlSync": false,
+          "allowCustomValue": true,
+          "hide": "dontHide"
         }
-      ]
-    },
-    "panels": [
-      {
-        "type": "timeseries",
-        "title": "CPU Usage (%)",
-        "targets": [
-          {
-            "expr": "100 * rate(process_cpu_seconds_total{instance=\"$host\"}[5m])",
-            "legendFormat": "CPU"
-          }
-        ],
-        "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
       },
       {
-        "type": "timeseries",
-        "title": "Memory Usage (RSS)",
-        "targets": [
-          {
-            "expr": "process_resident_memory_bytes{instance=\"$host\"}",
-            "legendFormat": "RSS"
-          }
-        ],
-        "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
-      },
-      {
-        "type": "timeseries",
-        "title": "Disk Usage (%)",
-        "targets": [
-          {
-            "expr": "100 * (1 - (node_filesystem_avail_bytes{instance=\"$host\", mountpoint=\"/\"} / node_filesystem_size_bytes{instance=\"$host\", mountpoint=\"/\"}))",
-            "legendFormat": "Disk %"
-          }
-        ],
-        "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
-      },
-      {
-        "type": "timeseries",
-        "title": "Network Throughput (RX/TX)",
-        "targets": [
-          {
-            "expr": "rate(node_network_receive_bytes_total{instance=\"$host\", device!=\"lo\"}[5m])",
-            "legendFormat": "RX"
-          },
-          {
-            "expr": "rate(node_network_transmit_bytes_total{instance=\"$host\", device!=\"lo\"}[5m])",
-            "legendFormat": "TX"
-          }
-        ],
-        "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
-      },
-      {
-        "type": "timeseries",
-        "title": "Alloy Process Memory",
-        "targets": [
-          {
-            "expr": "alloy_resources_process_resident_memory_bytes{instance=\"$host\"}",
-            "legendFormat": "Alloy RSS"
-          }
-        ],
-        "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 }
-      },
-      {
-        "type": "timeseries",
-        "title": "Prometheus Scrape Duration",
-        "targets": [
-          {
-            "expr": "rate(prometheus_target_scrape_duration_seconds_sum{instance=\"$host\"}[5m])",
-            "legendFormat": "Scrape Duration"
-          }
-        ],
-        "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 }
+        "name": "host",
+        "type": "query",
+        "datasource": "Prometheus",
+        "refresh": 1,
+        "query": "label_values(process_cpu_seconds_total, instance)",
+        "includeAll": false,
+        "multi": false,
+        "sort": 1
       }
     ]
-  }
-  
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "CPU Usage (%)",
+      "targets": [
+        {
+          "expr": "100 * rate(process_cpu_seconds_total{instance=\"$host\"}[5m])",
+          "legendFormat": "CPU"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory Usage (RSS)",
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes{instance=\"$host\"}",
+          "legendFormat": "RSS"
+        }
+      ],
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Alloy Process Memory",
+      "targets": [
+        {
+          "expr": "alloy_resources_process_resident_memory_bytes{instance=\"$host\"}",
+          "legendFormat": "Alloy RSS"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Rule Evaluation Duration",
+      "targets": [
+        {
+          "expr": "prometheus_rule_evaluation_duration_seconds",
+          "refId": "A"
+        }
+      ],
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
+    },
+    {
+      "type": "stat",
+      "title": "Rule Evaluation Failures",
+      "targets": [
+        {
+          "expr": "prometheus_rule_evaluation_failures_total",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value"
+      },
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 }
+    },
+    {
+      "type": "stat",
+      "title": "Alloy Restarts",
+      "targets": [
+        {
+          "expr": "changes(process_start_time_seconds{job=\"alloy\"}[1h])",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Prometheus Ingestion Rate (samples/sec)",
+      "targets": [
+        {
+          "expr": "rate(prometheus_tsdb_head_samples_appended_total[5m])",
+          "refId": "A"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Prometheus Scrape Duration",
+      "targets": [
+        {
+          "expr": "rate(prometheus_target_scrape_duration_seconds_sum{instance=\"$host\"}[5m])",
+          "legendFormat": "Scrape Duration"
+        }
+      ],
+      "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 }
+    },
+    {
+      "type": "stat",
+      "title": "Targets Up",
+      "targets": [
+        {
+          "expr": "count(up == 1)",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value"
+      },
+      "gridPos": { "x": 0, "y": 32, "w": 12, "h": 8 }
+    },
+    {
+      "type": "stat",
+      "title": "Targets Down",
+      "targets": [
+        {
+          "expr": "count(up == 0)",
+          "refId": "B"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value"
+      },
+      "gridPos": { "x": 12, "y": 32, "w": 12, "h": 8 }
+    },
+    {
+      "type": "stat",
+      "title": "Alloy Uptime",
+      "targets": [
+        {
+          "expr": "time() - process_start_time_seconds{job=\"alloy\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "gridPos": { "x": 0, "y": 40, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Disk Usage (%)",
+      "targets": [
+        {
+          "expr": "100 * (1 - (node_filesystem_avail_bytes{instance=\"$host\", mountpoint=\"/\"} / node_filesystem_size_bytes{instance=\"$host\", mountpoint=\"/\"}))",
+          "legendFormat": "Disk %"
+        }
+      ],
+      "gridPos": { "x": 12, "y": 40, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Network Throughput (RX/TX)",
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_bytes_total{instance=\"$host\", device!=\"lo\"}[5m])",
+          "legendFormat": "RX"
+        },
+        {
+          "expr": "rate(node_network_transmit_bytes_total{instance=\"$host\", device!=\"lo\"}[5m])",
+          "legendFormat": "TX"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 48, "w": 24, "h": 8 }
+    }
+  ]
+}
