@@ -1,36 +1,16 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+set -e
 
-echo "🧹 Tearing down observability stack..."
+echo "🔻 Stopping and removing containers..."
+docker compose down -v
 
-# Detect the docker compose project name (usually the folder name)
-PROJECT_NAME=$(docker compose ls --format '{{.Name}}' | head -n 1)
+echo "🧼 Removing dangling Docker resources..."
+docker system prune -f
 
-if [ -z "$PROJECT_NAME" ]; then
-  echo "⚠️  Could not detect project name automatically. Falling back to folder name."
-  PROJECT_NAME=$(basename "$PWD")
-fi
+echo "🗑  Cleaning known_hosts entries for host-a and host-b..."
+ssh-keygen -R "[127.0.0.1]:2222" >/dev/null 2>&1 || true
+ssh-keygen -R "[127.0.0.1]:2223" >/dev/null 2>&1 || true
+ssh-keygen -R "127.0.0.1" >/dev/null 2>&1 || true
+ssh-keygen -R "localhost" >/dev/null 2>&1 || true
 
-echo "📛 Using project name: $PROJECT_NAME"
-
-# Stop and remove containers, networks, and default resources
-docker compose down
-
-echo "🗑 Removing persistent volumes..."
-VOLUMES=(
-  "${PROJECT_NAME}_host-a-data"
-  "${PROJECT_NAME}_host-b-data"
-  "${PROJECT_NAME}_grafana-data"
-  "${PROJECT_NAME}_prometheus-data"
-)
-
-for VOL in "${VOLUMES[@]}"; do
-  if docker volume inspect "$VOL" >/dev/null 2>&1; then
-    echo "  - Removing volume: $VOL"
-    docker volume rm "$VOL" >/dev/null
-  else
-    echo "  - Volume not found (skipping): $VOL"
-  fi
-done
-
-echo "✨ Teardown complete!"
+echo "✨ Teardown complete."
