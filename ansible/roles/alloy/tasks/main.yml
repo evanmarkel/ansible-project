@@ -44,3 +44,15 @@
         --storage.path=/var/lib/alloy
         --listen-address=0.0.0.0 \
         --listen-port=12345
+
+- name: Ensure run-alloy.sh is executable
+  file:
+    path: /usr/local/bin/run-alloy.sh
+    mode: '0755'
+      
+- name: Start Alloy
+  shell: "nohup /usr/local/bin/run-alloy.sh >/var/log/alloy.log 2>&1 &"
+  args:
+    executable: /bin/bash
+  async: 0
+  poll: 0
