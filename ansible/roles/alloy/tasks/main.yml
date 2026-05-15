@@ -27,8 +27,8 @@
     deb: /tmp/alloy.deb
 
 - name: Deploy Alloy config
-  copy:
-    src: config.alloy
+  template:
+    src: config.alloy.j2
     dest: /etc/alloy/config.alloy
     owner: alloy
     group: alloy

@@ -1,0 +1,32 @@
+logging {
+  level = "info"
+}
+
+local.process "proc" {}
+local.cpu "cpu" {}
+local.meminfo "mem" {}
+
+prometheus.exporter "node" {
+  process    = local.process.proc.output
+  cpu        = local.cpu.cpu.output
+  meminfo    = local.meminfo.mem.output
+}
+
+prometheus.scrape "self" {
+  targets = [{ __address__ = "localhost:12345" }]
+  forward_to = [prometheus.remote_write.local.receiver]
+}
+
+prometheus.relabel "add_host_label" {
+  rule {
+    target_label = "instance"
+    replacement  = "{{ inventory_hostname }}"
+  }
+}
+
+prometheus.remote_write "local" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+  write_relabel_configs = [prometheus.relabel.add_host_label.receiver]
+}

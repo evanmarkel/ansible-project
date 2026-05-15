@@ -15,7 +15,7 @@
         "spec": {
           "name": "host",
           "type": "query",
-          "definition": "label_values(up, instance)",
+          "definition": "label_values(process_cpu_seconds_total, instance)",
           "query": {
             "group": "prometheus",
             "kind": "DataQuery",
