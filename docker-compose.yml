@@ -31,6 +31,7 @@ services:
       - "--web.enable-remote-write-receiver"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/rules:/etc/prometheus/rules
       - prometheus-data:/prometheus
     ports: 
       - "9090:9090"
@@ -45,6 +46,7 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: admin
     volumes:
       - grafana-data:/var/lib/grafana
+      - ${PWD}/ansible/roles/grafana/provisioning:/etc/grafana/provisioning
     ports:
       - "3000:3000"
     networks:

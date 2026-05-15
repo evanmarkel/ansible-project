@@ -1,0 +1,48 @@
+groups:
+    - name: host-alerts
+      rules:
+        - alert: InstanceDown
+          expr: up == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Instance {{ $labels.instance }} is down"
+            description: "Prometheus target {{ $labels.instance }} has been down for more than 2 minutes."
+  
+        - alert: HighCPUUsage
+          expr: avg by (instance) (rate(process_cpu_seconds_total[5m])) > 0.8
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU usage on {{ $labels.instance }}"
+            description: "CPU usage > 80% for 5 minutes."
+  
+        - alert: HighMemoryUsage
+          expr: (process_resident_memory_bytes) / (process_virtual_memory_bytes) > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage on {{ $labels.instance }}"
+            description: "Process RSS is > 90% of virtual memory for 5 minutes."
+  
+        - alert: LowDiskSpaceRoot
+          expr: node_filesystem_avail_bytes{mountpoint="/"} < 5 * 1024 * 1024 * 1024
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Low disk space on {{ $labels.instance }} /"
+            description: "Root filesystem has less than 10% free space."
+  
+        - alert: SlowScrapes
+          expr: histogram_quantile(0.9, sum by (job, le) (rate(prometheus_scrape_duration_seconds_bucket[5m]))) > 5
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Prometheus scrapes are slow"
+            description: "p90 scrape duration > 5s for 10 minutes."
+  
