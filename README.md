@@ -99,3 +99,7 @@ Metrics for host-a and host-b with prometheus alert rules. Templated Label to sw
 <img width="1608" height="836" alt="Screenshot 2026-05-15 at 09 26 54" src="https://github.com/user-attachments/assets/39d3fc92-cf64-4fa3-9774-747496b442b2" />
 
 ### Teardown
+Run to remove infrastructure cleanly
+```
+./teardown.sh
+'''
